@@ -1,7 +1,7 @@
 package WorkplaceInfo
 
 type WorkplaceInfo struct {
-	hostname     string
-	networkAddr  int
-	currUsername string
+	Hostname     string
+	NetworkAddr  string
+	CurrUsername string
 }
