@@ -1,40 +1,36 @@
 package pkg
 
 import (
-	"fmt"
 	"net"
 	"os"
+	"os/user"
 )
 
-func GetHostName() (hostname string, err error) {
+func GetHostName() (hostname string) {
 
-	hostname, err = os.Hostname()
+	hostname, err := os.Hostname()
 
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		panic(err)
 	}
 
-	return hostname, nil
+	return hostname
 }
 
-func GetIPAddress() (ipAddr string, errIP error) {
+func GetIPAddress() (ipAddr string) {
 
-	iface, err := net.Interfaces()
+	ifaces, err := net.Interfaces()
 
 	if err != nil {
-		fmt.Println(err)
-		errIP = err
-		return "", errIP
+		panic(err)
 	}
 
-	for _, i := range iface {
+	for _, i := range ifaces {
+
 		addrs, err := i.Addrs()
 
 		if err != nil {
-			fmt.Println(err)
-			errIP = err
-			return "", errIP
+			panic(err)
 		}
 
 		for _, addr := range addrs {
@@ -53,5 +49,18 @@ func GetIPAddress() (ipAddr string, errIP error) {
 
 	}
 
-	return ipAddr, nil
+	return ipAddr
+}
+
+func GetCurrUsername() (currUser string) {
+
+	user, err := user.Current()
+
+	if err != nil {
+		panic(err)
+	}
+
+	currUser = user.Username
+
+	return currUser
 }
