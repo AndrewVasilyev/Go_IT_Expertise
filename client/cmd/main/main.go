@@ -99,24 +99,66 @@ func main() {
 		if wrkPlcInf.Hostname == "" && wrkPlcInf.NetworkAddr == "" && wrkPlcInf.CurrUsername == "" {
 			log.Println("Can't update user. Not enough data provided.")
 		}
+
+		reqBody, err := json.Marshal(map[string]string{
+			"hostname": wrkPlcInf.Hostname,
+			"ip":       wrkPlcInf.NetworkAddr,
+			"username": wrkPlcInf.CurrUsername,
+		})
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		client := &http.Client{}
+
+		request, err := http.NewRequest(http.MethodPut, serverAddr+fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr), bytes.NewBuffer(reqBody))
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		request.Header.Set("Content-Type", "application/json; charset=utf-8")
+		resp, err := client.Do(request)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("Desired action done. Status code: %d", resp.StatusCode)
 		break
+
 	case "d":
 		if wrkPlcInf.NetworkAddr == "" {
 			log.Println("Can't delete user. IP address not specified.")
 		}
+
+		reqBody, err := json.Marshal(map[string]string{
+			"ip": wrkPlcInf.NetworkAddr,
+		})
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		client := &http.Client{}
+
+		request, err := http.NewRequest(http.MethodDelete, serverAddr+fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr), bytes.NewBuffer(reqBody))
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		request.Header.Set("Content-Type", "application/json; charset=utf-8")
+		resp, err := client.Do(request)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("Desired action done. Status code: %d", resp.StatusCode)
 		break
 	default:
 	}
-
-	// flag.CommandLine.Output().Write([]byte("\n\r"))
-	// flag.CommandLine.Output().Write([]byte("Hostname:"))
-	// flag.CommandLine.Output().Write([]byte(wrkPlcInf.Hostname))
-	// flag.CommandLine.Output().Write([]byte("\n\r"))
-	// flag.CommandLine.Output().Write([]byte("IP Address:"))
-	// flag.CommandLine.Output().Write([]byte(wrkPlcInf.NetworkAddr))
-	// flag.CommandLine.Output().Write([]byte("\n\r"))
-	// flag.CommandLine.Output().Write([]byte("Current user:"))
-	// flag.CommandLine.Output().Write([]byte(wrkPlcInf.CurrUsername))
-	// flag.CommandLine.Output().Write([]byte("\n\r"))
 
 }
