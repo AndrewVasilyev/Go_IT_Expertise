@@ -66,7 +66,7 @@ func main() {
 
 		defer respBody.Body.Close()
 
-		fmt.Println(respBody.StatusCode)
+		log.Printf("Adding new workplace done. Status code: %d", respBody.StatusCode)
 	}
 
 	switch wrkPlcInf.Action {
@@ -90,9 +90,13 @@ func main() {
 			log.Fatal(err)
 		}
 
-		json.Unmarshal(body, &wrkPlcMdl)
+		err = json.Unmarshal(body, &wrkPlcMdl)
 
-		fmt.Printf("Hostname: %s, IP Address: %s, Username: %s", wrkPlcMdl.Hostname, wrkPlcMdl.IPAddr, wrkPlcMdl.Username)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("Hostname: %s, IP Address: %s, Username: %s", wrkPlcMdl.Hostname, wrkPlcMdl.IPAddr, wrkPlcMdl.Username)
 		break
 
 	case "u":
@@ -125,7 +129,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("Desired action done. Status code: %d", resp.StatusCode)
+		log.Printf("Desired action done. Status code: %d", resp.StatusCode)
 		break
 
 	case "d":
@@ -156,7 +160,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("Desired action done. Status code: %d", resp.StatusCode)
+		log.Printf("Desired action done. Status code: %d", resp.StatusCode)
 		break
 	default:
 	}

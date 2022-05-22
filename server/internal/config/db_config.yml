@@ -1,0 +1,6 @@
+protocol: postgres
+username: postgres
+password: password
+host:     localhost
+port:     5432
+db:       workplaces_db
