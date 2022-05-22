@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
-	WorkplaceModel "github.com/AndrewVasilyev/Go_IT_Expertise/client/internal/models"
+	"github.com/AndrewVasilyev/Go_IT_Expertise/client/internal/models"
 	WorkplaceInfo "github.com/AndrewVasilyev/Go_IT_Expertise/client/internal/params"
 	"github.com/AndrewVasilyev/Go_IT_Expertise/client/pkg"
 )
@@ -20,8 +19,6 @@ func main() {
 
 	var wrkPlcInf WorkplaceInfo.WorkplaceInfo
 	var empty WorkplaceInfo.WorkplaceInfo
-
-	var wrkPlcMdl WorkplaceModel.WorkplaceModel
 
 	var hostnameKey string
 	var ipAddressKey string
@@ -76,27 +73,45 @@ func main() {
 			log.Println("Can't read user. IP address not specified.")
 		}
 
-		respBody, err := http.Get(serverAddr + fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr))
+		client := &http.Client{}
+
+		request, err := http.NewRequest(http.MethodGet, serverAddr+"/workplace", bytes.NewBufferString(""))
+
+		query := request.URL.Query()
+		query.Add("ip", wrkPlcInf.NetworkAddr)
+
+		request.URL.RawQuery = query.Encode()
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		defer respBody.Body.Close()
-
-		body, err := ioutil.ReadAll(respBody.Body)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = json.Unmarshal(body, &wrkPlcMdl)
+		request.Header.Set("Content-Type", "application/json; charset=utf-8")
+		resp, err := client.Do(request)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		log.Printf("Hostname: %s, IP Address: %s, Username: %s", wrkPlcMdl.Hostname, wrkPlcMdl.IPAddr, wrkPlcMdl.Username)
+		defer resp.Body.Close()
+
+		var workplace models.WorkplaceModelDB
+
+		respBody, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = json.Unmarshal(respBody, &workplace)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if resp.StatusCode == 200 {
+			log.Printf("Hostname: %s, IP Address: %s, Username: %s", workplace.Data.Hostname, workplace.Data.IPAddr, workplace.Data.Username)
+		} else {
+			log.Printf("Desired action was not implemented. %s", resp.Body)
+		}
 		break
 
 	case "u":
@@ -116,7 +131,12 @@ func main() {
 
 		client := &http.Client{}
 
-		request, err := http.NewRequest(http.MethodPut, serverAddr+fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr), bytes.NewBuffer(reqBody))
+		request, err := http.NewRequest(http.MethodPut, serverAddr+"/workplace", bytes.NewBuffer(reqBody))
+
+		query := request.URL.Query()
+		query.Add("ip", wrkPlcInf.NetworkAddr)
+
+		request.URL.RawQuery = query.Encode()
 
 		if err != nil {
 			log.Fatal(err)
@@ -129,7 +149,13 @@ func main() {
 			log.Fatal(err)
 		}
 
-		log.Printf("Desired action done. Status code: %d", resp.StatusCode)
+		defer resp.Body.Close()
+
+		if resp.StatusCode == 200 {
+			log.Printf("Desired action done. Status code: %d", resp.StatusCode)
+		} else {
+			log.Printf("Desired action was not implemented. %s", resp.Body)
+		}
 		break
 
 	case "d":
@@ -139,9 +165,12 @@ func main() {
 
 		client := &http.Client{}
 
-		request, err := http.NewRequest(http.MethodDelete, serverAddr+fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr), nil)
+		request, err := http.NewRequest(http.MethodDelete, serverAddr+"/workplace", bytes.NewBufferString(""))
 
-		request.URL.Query().Add("ip", wrkPlcInf.NetworkAddr)
+		query := request.URL.Query()
+		query.Add("ip", wrkPlcInf.NetworkAddr)
+
+		request.URL.RawQuery = query.Encode()
 
 		if err != nil {
 			log.Fatal(err)
@@ -154,7 +183,14 @@ func main() {
 			log.Fatal(err)
 		}
 
-		log.Printf("Desired action done. Status code: %d", resp.StatusCode)
+		defer resp.Body.Close()
+
+		if resp.StatusCode == 200 {
+			log.Printf("Desired action done. Status code: %d", resp.StatusCode)
+		} else {
+			log.Printf("Desired action was not implemented. %s", resp.Body)
+		}
+
 		break
 	default:
 	}

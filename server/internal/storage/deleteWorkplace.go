@@ -8,18 +8,11 @@ import (
 
 func (h DbHandler) DeleteWorkplace(w http.ResponseWriter, r *http.Request) {
 
-	//params := mux.Vars(r)
-
-	//ip, _ := strconv.Atoi(params["ip"])
-
 	ip := r.URL.Query().Get("ip")
 
-	//var workplace models.WorkplaceModelDB
-
-	if result := h.DB.Exec(fmt.Sprintf("DELETE data FROM workplace_model_dbs WHERE data -> 'ip'='%s'", ip)); result.Error != nil {
-
+	if result := h.DB.Debug().Exec(fmt.Sprintf("DELETE FROM public.workplace_model_dbs WHERE data ->> 'ip' = '%s';", ip)); result.Error != nil {
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Defined workplace was not found"})
 
 		return

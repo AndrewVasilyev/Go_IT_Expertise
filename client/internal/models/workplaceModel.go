@@ -5,3 +5,8 @@ type WorkplaceModel struct {
 	IPAddr   string `json:"ip"`
 	Username string `json:"username"`
 }
+
+type WorkplaceModelDB struct {
+	ID   int `json:"ID"`
+	Data WorkplaceModel
+}
