@@ -43,7 +43,7 @@ func (h DbHandler) UpdateWorkplace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"data": "Record Updated Successfuly"})
 
 }
