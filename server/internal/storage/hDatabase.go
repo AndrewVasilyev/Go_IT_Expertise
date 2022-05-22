@@ -5,6 +5,7 @@ import (
 	"os"
 
 	cfg "github.com/AndrewVasilyev/Go_IT_Expertise/server/internal/config"
+	"github.com/AndrewVasilyev/Go_IT_Expertise/server/internal/models"
 	yaml "gopkg.in/yaml.v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -35,11 +36,15 @@ func InitDB(path string) *gorm.DB {
 		log.Fatal(err)
 	}
 
+	var workplace models.WorkplaceModelDB
+
+	db.AutoMigrate(&workplace)
+
 	return db
 }
 
 func NewDB() *gorm.DB {
 
-	return InitDB("db/config.yml")
+	return InitDB("internal/config/db_config.yml")
 
 }

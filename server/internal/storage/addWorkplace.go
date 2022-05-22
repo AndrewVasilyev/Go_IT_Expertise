@@ -19,9 +19,17 @@ func (h DbHandler) AddWorkplace(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		log.Fatal(err)
 	}
-	var workplace models.WorkplaceModel
 
-	json.Unmarshal(body, &workplace)
+	var workplace models.WorkplaceModelDB
+
+	err = workplace.Data.Scan(body)
+	if err != nil {
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Bad Request"})
+
+		return
+	}
 
 	if result := h.DB.Create(&workplace); result.Error != nil {
 

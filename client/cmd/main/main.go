@@ -58,7 +58,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		respBody, err := http.Post(serverAddr, "application/json", bytes.NewBuffer(reqBody))
+		respBody, err := http.Post(serverAddr+"/workplace", "application/json", bytes.NewBuffer(reqBody))
 
 		if err != nil {
 			log.Fatal(err)
@@ -137,17 +137,11 @@ func main() {
 			log.Println("Can't delete user. IP address not specified.")
 		}
 
-		reqBody, err := json.Marshal(map[string]string{
-			"ip": wrkPlcInf.NetworkAddr,
-		})
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		client := &http.Client{}
 
-		request, err := http.NewRequest(http.MethodDelete, serverAddr+fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr), bytes.NewBuffer(reqBody))
+		request, err := http.NewRequest(http.MethodDelete, serverAddr+fmt.Sprintf("/%s", wrkPlcInf.NetworkAddr), nil)
+
+		request.URL.Query().Add("ip", wrkPlcInf.NetworkAddr)
 
 		if err != nil {
 			log.Fatal(err)

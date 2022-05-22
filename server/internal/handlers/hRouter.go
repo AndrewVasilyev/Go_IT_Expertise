@@ -15,6 +15,7 @@ type HttpRouter struct {
 
 func NewHttpRouter(router *mux.Router, db storage.DbHandler) *HttpRouter {
 	router.HandleFunc("/workplace", db.AddWorkplace).Methods(http.MethodPost)
+	router.HandleFunc("/workplace", db.DeleteWorkplace).Methods(http.MethodDelete)
 	// router.HandleFunc("/plants", dbHandler.GetAllPlants).Methods(http.MethodGet)
 	// router.HandleFunc("/plants", dbHandler.AddPlant).Methods(http.MethodPost)
 	// router.HandleFunc("/plants/{id}", dbHandler.GetPlant).Methods(http.MethodGet)
@@ -25,5 +26,6 @@ func NewHttpRouter(router *mux.Router, db storage.DbHandler) *HttpRouter {
 }
 
 func (h *HttpRouter) Run(port string) {
+	log.Println("Server started")
 	log.Fatal(http.ListenAndServe(port, h.router))
 }
